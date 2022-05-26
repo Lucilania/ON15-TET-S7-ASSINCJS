@@ -8,12 +8,14 @@ e você pagará em 10x de R$390,00`
 // função que simula busca num banco que retorna o preço do produto:
 
 function buscarPreco(produto) {
-    setTimeout(() => {
-      if (produto === "hormonios") {
-        return {
+    return new Promise(resolve => {
+      setTimeout(() => {
+
+        if (produto === "hormonios") {
+        return resolve ({
           nome: "Hormônios",
           preco: 99.00
-        }
+        })
       } else if (produto === "unhas gel") {
         return {
           nome: "Unhas em Gel",
@@ -25,19 +27,34 @@ function buscarPreco(produto) {
           preco: 3500.00
         }
       } else {
-        return "Produto não encontrado"
+        return resolve ("Produto não encontrado")
       }
     }, 2000)
-  }
+  })
+}
   
   // função que simula busca num banco que retorna o valor das parcelas:
   
-  function calcularParcela(preco) {
-    let parcelasDesejadas = 10
-    setTimeout(() => {
-      return preco * parcelasDesejadas
-    }, 2000)
+  function calcularParcela(preco, parcelasDesejadas = 10) {
+    return new Promise (resolve =>{
+      setTimeout(() => {
+
+  resolve (preco/parcelasDesejadas)
+      }, 2000)
+    })
   }
+
+  async function exibirNotaFiscal(){
+    const produto = await buscarPreco ("hormonios")
+    const parcelas = await calcularParcelas (produto.preco, 10)
+
+    console.log(produto)
+    console.log(parcelas)
+}  
+  exibirNotaFiscal()
+
+   
+  
   
   /*
   2. Resolva usando async/await: 
@@ -52,31 +69,45 @@ function buscarPreco(produto) {
   dica: valor em real + (valor em real * juros1) + (valor em real * juros2) = valor final
   */
   
+
+  console.log("******************")
+  
   function buscarPrecoDolar() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          comercial: "5.03",
-          turismo: "5.17",
-        });
-      }, 1000);
-    });
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      return resolve({
+        comercial: "5.03",
+        turismo: "5.17",
+      });
+    }, 1000);
+  });
+}
+
+function buscarJurosImportacao() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      return resolve({
+        juros1: 0.06,
+        juros2: 0.11,
+        message:
+        "os dois juros são aplicados no valor total do produto em real",
+      });
+    }, 1000);
+  });
+}
+
+async function calcularValorEmReal(precoEmDolar) {
+  try {
+    const pegarPrecoDolar = await buscarPrecoDolar();
+    const precoReal = await buscarJurosImportacao();
+    const valorReal = pegarPrecoDolar.comercial * precoEmDolar;
+    const valorFinal = valorReal + (valorReal * precoReal.juros1) + (valorReal * precoReal.juros2);
+
+    return console.log(`O preço final do produto é ${valorFinal.toFixed(2).replace(".",",")}`);
+  } 
+  catch (error) {
+    console.log(error)
   }
-  
-  function buscarJurosImportacao() {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          juros1: 0.06,
-          juros2: 0.11,
-          message:
-          "os dois juros são aplicados no valor total do produto em real",
-        });
-      }, 1000);
-    });
-  }
-  
-  async function calcularValorEmReal(precoEmDolar) {
-    try {} 
-    catch (error) {}
-  }
+}
+
+calcularValorEmReal(1270) 
